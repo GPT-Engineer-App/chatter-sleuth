@@ -1,13 +1,14 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useConversationData } from '../hooks/useConversationData';
 
 const ConversationInsights = () => {
-  // TODO: Replace with actual insights
-  const insights = [
-    "Customer expressed frustration with product delivery times.",
-    "Agent successfully de-escalated the situation by offering a discount.",
-    "Multiple mentions of competitor products - potential churn risk.",
-  ];
+  const { data: conversations, isLoading, error } = useConversationData();
+
+  if (isLoading) return <div>Loading insights...</div>;
+  if (error) return <div>Error loading insights: {error.message}</div>;
+
+  const insights = conversations.flatMap(conv => conv.insights).slice(0, 5);
 
   return (
     <Card>

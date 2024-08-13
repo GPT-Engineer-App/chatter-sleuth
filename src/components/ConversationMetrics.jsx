@@ -1,12 +1,17 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useConversationData } from '../hooks/useConversationData';
 
 const ConversationMetrics = () => {
-  // TODO: Replace with actual metrics
+  const { data: conversations, isLoading, error } = useConversationData();
+
+  if (isLoading) return <div>Loading metrics...</div>;
+  if (error) return <div>Error loading metrics: {error.message}</div>;
+
   const metrics = {
-    messageCount: 42,
-    averageResponseTime: '2m 30s',
-    sentimentScore: 0.75,
+    messageCount: conversations.reduce((total, conv) => total + conv.messageCount, 0),
+    averageResponseTime: calculateAverageResponseTime(conversations),
+    sentimentScore: calculateAverageSentiment(conversations),
   };
 
   return (
@@ -37,6 +42,16 @@ const ConversationMetrics = () => {
       </Card>
     </div>
   );
+};
+
+const calculateAverageResponseTime = (conversations) => {
+  const totalTime = conversations.reduce((total, conv) => total + conv.averageResponseTime, 0);
+  return (totalTime / conversations.length).toFixed(2) + 's';
+};
+
+const calculateAverageSentiment = (conversations) => {
+  const totalSentiment = conversations.reduce((total, conv) => total + conv.sentimentScore, 0);
+  return totalSentiment / conversations.length;
 };
 
 export default ConversationMetrics;
